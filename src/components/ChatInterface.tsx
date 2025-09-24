@@ -85,7 +85,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ webllmService }) =
     <div className="flex flex-col h-screen bg-dark">
       <ChatHeader />
 
-      <div className="flex-1 overflow-hidden flex flex-col max-w-6xl mx-auto w-full">
+      <div className="flex-1 overflow-hidden flex flex-col max-w-6xl mx-auto w-full px-2 sm:px-4">
         <MessageList messages={messages} />
 
         <InputArea

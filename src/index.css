@@ -4,34 +4,59 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-  }
-
-  .dark {
-    --background: 249 100% 9%;
-    --foreground: 0 0% 98%;
+    --dark: #0F0F23;
+    --dark-lighter: #1A1A2E;
+    --primary: #8B5CF6;
+    --primary-dark: #6D28D9;
+    --accent: #06B6D4;
   }
 
   body {
-    @apply bg-dark text-white;
+    background-color: var(--dark);
+    color: white;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 }
 
 @layer utilities {
+  .bg-dark {
+    background-color: var(--dark);
+  }
+
+  .bg-dark-lighter {
+    background-color: var(--dark-lighter);
+  }
+
+  .text-primary {
+    color: var(--primary);
+  }
+
+  .text-accent {
+    color: var(--accent);
+  }
+
   .glass {
-    @apply bg-white/5 backdrop-blur-lg border border-white/10;
+    background-color: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .glass-hover {
-    @apply hover:bg-white/10 transition-colors;
+    transition: background-color 0.2s;
+  }
+
+  .glass-hover:hover {
+    background-color: rgba(255, 255, 255, 0.1);
   }
 
   .gradient-primary {
-    @apply bg-gradient-to-r from-primary to-primary-dark;
+    background: linear-gradient(to right, var(--primary), var(--primary-dark));
   }
 
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+    background: linear-gradient(to right, var(--primary), var(--accent));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
   }
 }

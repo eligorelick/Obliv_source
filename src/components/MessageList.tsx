@@ -41,58 +41,62 @@ export const MessageList: React.FC<MessageListProps> = ({ messages }) => {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-4">
+    <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-3 sm:space-y-4">
       {messages.length === 0 && (
-        <div className="text-center text-gray-500 mt-8">
+        <div className="text-center text-gray-500 mt-8 px-4">
           <Bot className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p>Start a conversation with your private AI assistant</p>
-          <p className="text-sm mt-2">Your messages never leave this device</p>
+          <p className="text-sm sm:text-base">Start a conversation with your private AI assistant</p>
+          <p className="text-xs sm:text-sm mt-2">Your messages never leave this device</p>
         </div>
       )}
 
       {messages.map((message, index) => (
         <div
           key={index}
-          className={`flex gap-3 ${
+          className={`flex gap-2 sm:gap-3 ${
             message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
           } animate-fade-in`}
         >
           <div
-            className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+            className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center ${
               message.role === 'user' ? 'bg-primary' : 'glass'
             }`}
           >
             {message.role === 'user' ? (
-              <User className="h-4 w-4 text-white" />
+              <User className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
             ) : (
-              <Bot className="h-4 w-4 text-accent" />
+              <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-accent" />
             )}
           </div>
 
           <div
-            className={`flex-1 max-w-[70%] ${
+            className={`flex-1 max-w-[85%] sm:max-w-[70%] ${
               message.role === 'user' ? 'text-right' : 'text-left'
             }`}
           >
             <div
-              className={`inline-block p-4 rounded-2xl ${
+              className={`inline-block p-3 sm:p-4 rounded-2xl ${
                 message.role === 'user'
                   ? 'bg-primary text-white'
                   : 'glass text-gray-100'
               }`}
             >
               {message.role === 'user' ? (
-                <p className="whitespace-pre-wrap">{message.content}</p>
+                <p className="whitespace-pre-wrap text-sm sm:text-base">{message.content}</p>
               ) : (
-                renderMarkdown(message.content)
+                <div className="text-sm sm:text-base">
+                  {renderMarkdown(message.content)}
+                </div>
               )}
             </div>
 
-            <div className="mt-2 flex items-center gap-2 text-xs text-gray-500">
+            <div className={`mt-1 sm:mt-2 flex items-center gap-2 text-xs text-gray-500 ${
+              message.role === 'user' ? 'justify-end' : 'justify-start'
+            }`}>
               <span>{new Date(message.timestamp).toLocaleTimeString()}</span>
               <button
                 onClick={() => copyToClipboard(message.content, index)}
-                className="hover:text-gray-300 transition-colors"
+                className="hover:text-gray-300 transition-colors p-1"
                 aria-label="Copy message"
               >
                 {copiedIndex === index ? (

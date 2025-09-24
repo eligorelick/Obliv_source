@@ -13,10 +13,10 @@ export default {
           dark: "#6D28D9",
         },
         accent: "#06B6D4",
-      },
-      backgroundColor: {
-        dark: "#0F0F23",
-        "dark-lighter": "#1A1A2E",
+        dark: {
+          DEFAULT: "#0F0F23",
+          lighter: "#1A1A2E",
+        }
       },
       animation: {
         "fade-in": "fadeIn 0.5s ease-in-out",
@@ -38,7 +38,5 @@ export default {
       },
     },
   },
-  plugins: [
-    require("@tailwindcss/typography"),
-  ],
+  plugins: [],
 }

@@ -50,17 +50,17 @@ export const InputArea: React.FC<InputAreaProps> = ({
   };
 
   return (
-    <div className="border-t border-white/10 p-4">
+    <div className="border-t border-white/10 p-3 sm:p-4">
       {rateLimitWarning && (
         <div className="mb-3 glass rounded-lg p-3 border-yellow-500/50 bg-yellow-500/10">
-          <div className="flex items-center gap-2 text-sm text-yellow-400">
-            <AlertCircle className="h-4 w-4" />
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-yellow-400">
+            <AlertCircle className="h-4 w-4 flex-shrink-0" />
             <span>Please slow down. Too many messages sent.</span>
           </div>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="flex gap-3">
+      <form onSubmit={handleSubmit} className="flex gap-2 sm:gap-3">
         <div className="flex-1 relative">
           <textarea
             ref={textareaRef}
@@ -73,14 +73,14 @@ export const InputArea: React.FC<InputAreaProps> = ({
                 : 'Type your message... (Shift+Enter for new line)'
             }
             disabled={disabled || isGenerating}
-            className="w-full glass rounded-xl px-4 py-3 text-white placeholder-gray-500
+            className="w-full glass rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base text-white placeholder-gray-500
                      focus:outline-none focus:ring-2 focus:ring-primary resize-none
-                     disabled:opacity-50 disabled:cursor-not-allowed"
+                     disabled:opacity-50 disabled:cursor-not-allowed min-h-[2.5rem]"
             rows={1}
             maxLength={4000}
           />
 
-          <div className="absolute bottom-2 right-2 text-xs text-gray-500">
+          <div className="absolute bottom-1 right-2 text-xs text-gray-500">
             {input.length}/4000
           </div>
         </div>
@@ -89,29 +89,29 @@ export const InputArea: React.FC<InputAreaProps> = ({
           <button
             type="button"
             onClick={onStopGeneration}
-            className="glass px-6 py-3 rounded-xl text-white hover:bg-red-500/20
-                     transition-colors flex items-center gap-2"
+            className="glass px-3 sm:px-6 py-2 sm:py-3 rounded-xl text-white hover:bg-red-500/20
+                     transition-colors flex items-center gap-1 sm:gap-2 flex-shrink-0"
             aria-label="Stop generation"
           >
-            <Square className="h-5 w-5" />
+            <Square className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="hidden sm:inline">Stop</span>
           </button>
         ) : (
           <button
             type="submit"
             disabled={!input.trim() || disabled}
-            className="gradient-primary px-6 py-3 rounded-xl text-white
+            className="gradient-primary px-3 sm:px-6 py-2 sm:py-3 rounded-xl text-white
                      disabled:opacity-50 disabled:cursor-not-allowed
-                     hover:opacity-90 transition-opacity flex items-center gap-2"
+                     hover:opacity-90 transition-opacity flex items-center gap-1 sm:gap-2 flex-shrink-0"
             aria-label="Send message"
           >
-            <Send className="h-5 w-5" />
+            <Send className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="hidden sm:inline">Send</span>
           </button>
         )}
       </form>
 
-      <div className="mt-2 text-xs text-gray-500 text-center">
+      <div className="mt-2 text-xs text-gray-500 text-center px-2">
         All messages are processed locally • No data leaves your device
       </div>
     </div>

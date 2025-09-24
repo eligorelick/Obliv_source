@@ -30,7 +30,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
     });
   }, []);
 
-  const getModelStatus = (modelKey: 'tiny' | 'medium' | 'large') => {
+  const getModelStatus = (modelKey: 'tiny' | 'medium' | 'large' | 'xl' | 'uncensored') => {
     if (!hardware) return 'checking';
 
     const model = MODELS[modelKey];
@@ -83,18 +83,18 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-6">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-white mb-4">Choose Your AI Model</h2>
-        <p className="text-gray-400">Select a model based on your device capabilities</p>
+    <div className="w-full max-w-6xl mx-auto p-4 sm:p-6">
+      <div className="text-center mb-6 sm:mb-8">
+        <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4">Choose Your AI Model</h2>
+        <p className="text-sm sm:text-base text-gray-400">Select a model based on your device capabilities</p>
       </div>
 
       {/* Hardware Info */}
       {hardware && (
-        <div className="glass rounded-xl p-4 mb-8 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Cpu className="h-5 w-5 text-accent" />
-            <span className="text-sm text-gray-300">
+        <div className="glass rounded-xl p-3 sm:p-4 mb-6 sm:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <Cpu className="h-4 w-4 sm:h-5 sm:w-5 text-accent flex-shrink-0" />
+            <span className="text-xs sm:text-sm text-gray-300">
               Your Device: {hardware.memory}GB RAM • {hardware.cores} Cores •{' '}
               {hardware.hasWebGPU ? 'WebGPU Enabled' : 'CPU Only'}
             </span>
@@ -104,8 +104,8 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
       )}
 
       {/* Model Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {(Object.keys(MODELS) as Array<'tiny' | 'medium' | 'large'>).map(modelKey => {
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6">
+        {(Object.keys(MODELS) as Array<'tiny' | 'medium' | 'large' | 'xl' | 'uncensored'>).map(modelKey => {
           const model = MODELS[modelKey];
           const status = getModelStatus(modelKey);
           const isSelected = selectedModel?.id === model.id;
@@ -117,31 +117,32 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
               onClick={() => !isDisabled && onModelSelect(model)}
               disabled={isDisabled}
               className={`
-                glass rounded-xl p-6 text-left transition-all transform hover:scale-105
+                glass rounded-xl p-4 sm:p-6 text-left transition-all transform hover:scale-105
                 ${getStatusColor(status)}
                 ${isSelected ? 'ring-2 ring-primary' : ''}
                 ${isDisabled ? '' : 'hover:bg-white/10'}
+                w-full
               `}
             >
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-xl font-semibold text-white">{model.name}</h3>
-                  <p className="text-sm text-gray-400 mt-1">{model.size}</p>
+              <div className="flex items-start justify-between mb-3 sm:mb-4">
+                <div className="flex-1">
+                  <h3 className="text-lg sm:text-xl font-semibold text-white">{model.name}</h3>
+                  <p className="text-xs sm:text-sm text-gray-400 mt-1">{model.size}</p>
                 </div>
-                {isSelected && <Check className="h-5 w-5 text-primary" />}
+                {isSelected && <Check className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0 ml-2" />}
               </div>
 
               {getStatusBadge(status)}
 
-              <p className="text-gray-300 mt-4 text-sm">{model.description}</p>
+              <p className="text-gray-300 mt-3 sm:mt-4 text-xs sm:text-sm">{model.description}</p>
 
-              <div className="mt-4 space-y-2">
+              <div className="mt-3 sm:mt-4 space-y-1 sm:space-y-2">
                 <div className="flex items-center gap-2 text-xs text-gray-400">
-                  <Zap className="h-3 w-3" />
+                  <Zap className="h-3 w-3 flex-shrink-0" />
                   <span>Min {model.requirements.ram}GB RAM</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-gray-400">
-                  <Cpu className="h-3 w-3" />
+                  <Cpu className="h-3 w-3 flex-shrink-0" />
                   <span>GPU {model.requirements.gpu}</span>
                 </div>
               </div>
@@ -149,14 +150,25 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
               {isSelected && isLoading && (
                 <div className="mt-4">
                   <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
-                    <span>{loadingStatus}</span>
-                    <span>{Math.round(loadingProgress)}%</span>
+                    <span className="truncate pr-2">{loadingStatus}</span>
+                    <span className="font-mono flex-shrink-0">{Math.round(loadingProgress)}%</span>
                   </div>
-                  <div className="w-full bg-gray-700 rounded-full h-2">
-                    <div
-                      className="gradient-primary h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${loadingProgress}%` }}
-                    />
+                  <div className="w-full bg-gray-700 rounded-full h-2 sm:h-3 overflow-hidden">
+                    <div className="relative h-full">
+                      <div
+                        className="gradient-primary h-full transition-all duration-500 ease-out"
+                        style={{ width: `${loadingProgress}%` }}
+                      />
+                      {loadingProgress > 0 && loadingProgress < 100 && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {loadingProgress < 30 && 'Downloading model...'}
+                    {loadingProgress >= 30 && loadingProgress < 70 && 'Loading into memory...'}
+                    {loadingProgress >= 70 && loadingProgress < 100 && 'Initializing...'}
+                    {loadingProgress >= 100 && 'Ready!'}
                   </div>
                 </div>
               )}

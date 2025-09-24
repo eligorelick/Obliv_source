@@ -22,7 +22,7 @@ export class WebLLMService {
 
   async initializeModel(
     modelConfig: ModelConfig,
-    onProgress?: (report: webllm.InitProgressReport) => void
+    _onProgress?: (report: webllm.InitProgressReport) => void
   ): Promise<void> {
     if (this.isLoading) {
       throw new Error('Model is already loading');
@@ -41,23 +41,11 @@ export class WebLLMService {
     this.isLoading = true;
 
     try {
-      const appConfig: webllm.AppConfig = {
-        model_list: [
-          {
-            model: `https://huggingface.co/mlc-ai/${modelConfig.id}`,
-            model_id: modelConfig.id,
-            model_lib: `https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/${modelConfig.id.includes('Llama-3.2-1B') ? 'Llama-3.2-1B-Instruct' : modelConfig.id.includes('Llama-3.2-3B') ? 'Llama-3.2-3B-Instruct' : 'Llama-3.1-8B-Instruct'}/webgpu.wasm`,
-          }
-        ]
-      };
+      this.engine = new webllm.MLCEngine();
 
-      this.engine = new webllm.MLCEngine({
-        initProgressCallback: onProgress,
-        appConfig,
-        logLevel: 'ERROR'
-      });
-
+      // Use the model ID directly - WebLLM will handle downloading from the registry
       await this.engine.reload(modelConfig.id);
+
       this.currentModel = modelConfig.id;
     } catch (error) {
       await this.cleanup();
