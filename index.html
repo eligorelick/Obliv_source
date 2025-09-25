@@ -18,17 +18,18 @@
     <meta http-equiv="Content-Security-Policy"
       content="default-src 'none';
                base-uri 'self';
-               script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline';
+               script-src 'self' 'wasm-unsafe-eval';
                worker-src 'self' blob:;
-               connect-src 'self' 
-                 https://huggingface.co 
-                 https://cdn-lfs.huggingface.co 
+               connect-src 'self'
+                 https://huggingface.co
+                 https://cdn-lfs.huggingface.co
                  https://*.huggingface.co
+                 https://*.xethub.hf.co
                  https://raw.githubusercontent.com
                  https://*.githubusercontent.com;
-               img-src 'self' data: blob:;
+               img-src 'self' data:;
                style-src 'self' 'unsafe-inline';
-               font-src 'self' data:;
+               font-src 'self';
                form-action 'none';
                object-src 'none';
                media-src 'self';
@@ -38,7 +39,7 @@
 
     <!-- Note: X-Frame-Options should be set in server configuration -->
     <!-- This is just a fallback -->
-    <meta http-equiv="X-Frame-Options" content="DENY">
+    <!-- <meta http-equiv="X-Frame-Options" content="DENY"> -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
     <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()" />

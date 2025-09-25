@@ -36,7 +36,7 @@ export default defineConfig({
         "base-uri 'self'; " +
         "script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline'; " +
         "worker-src 'self' blob:; " +
-        "connect-src 'self' https://huggingface.co https://cdn-lfs.huggingface.co https://*.huggingface.co https://raw.githubusercontent.com https://*.githubusercontent.com; " +
+        "connect-src 'self' https://huggingface.co https://cdn-lfs.huggingface.co https://*.huggingface.co https://*.xethub.hf.co https://raw.githubusercontent.com https://*.githubusercontent.com; " +
         "img-src 'self' data: blob:; " +
         "style-src 'self' 'unsafe-inline'; " +
         "font-src 'self' data:; " +
