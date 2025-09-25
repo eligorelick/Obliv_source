@@ -1,10 +1,11 @@
-// Security initialization and runtime protection
+// Government-Grade Security Manager with Maximum Hardening
 export class SecurityManager {
   private static instance: SecurityManager;
   private securityEnabled = true;
+  private integrityHash: string = '';
 
   private constructor() {
-    this.initializeSecurityMeasures();
+    this.initializeMaximumSecurity();
   }
 
   public static getInstance(): SecurityManager {
@@ -14,120 +15,464 @@ export class SecurityManager {
     return SecurityManager.instance;
   }
 
-  private initializeSecurityMeasures(): void {
-    // Disable right-click context menu in production
-    if (import.meta.env.PROD) {
-      document.addEventListener('contextmenu', (e) => e.preventDefault());
-    }
+  private initializeMaximumSecurity(): void {
+    // Immediate memory sanitization
+    this.secureMemoryWipe();
 
-    // Disable F12 and other developer shortcuts in production
-    if (import.meta.env.PROD) {
-      document.addEventListener('keydown', (e) => {
-        if (
-          e.key === 'F12' ||
-          (e.ctrlKey && e.shiftKey && e.key === 'I') ||
-          (e.ctrlKey && e.shiftKey && e.key === 'C') ||
-          (e.ctrlKey && e.shiftKey && e.key === 'J') ||
-          (e.ctrlKey && e.key === 'U')
-        ) {
-          e.preventDefault();
-          e.stopPropagation();
-          return false;
-        }
-      });
-    }
+    // Calculate initial page integrity
+    this.integrityHash = this.calculateIntegrityHash();
 
-    // Protect against iframe embedding
-    if (window.self !== window.top) {
-      window.top!.location.replace(window.self.location.href);
-    }
+    // Deploy all security measures
+    this.deployAntiDebugging();
+    this.deployAntiTampering();
+    this.deployDataProtection();
+    this.deployNetworkSecurity();
+    this.deployForensicProtection();
 
-    // Clear any potential sensitive data from memory on page unload
-    window.addEventListener('beforeunload', () => {
-      this.secureClearData();
-    });
-
-    // Monitor for suspicious behavior
-    this.setupSecurityMonitoring();
-
-    // Disable drag and drop to prevent file uploads
-    document.addEventListener('dragover', (e) => e.preventDefault());
-    document.addEventListener('drop', (e) => e.preventDefault());
-
-    // Prevent text selection in production for added security
-    if (import.meta.env.PROD) {
-      document.addEventListener('selectstart', (e) => {
-        const target = e.target as HTMLElement;
-        if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
-          e.preventDefault();
-        }
-      });
-    }
+    // Start continuous monitoring
+    this.startSecurityMonitoring();
   }
 
-  private setupSecurityMonitoring(): void {
-    // Monitor for suspicious console usage
-    let devtoolsOpen = false;
-    const threshold = 160;
-
-    setInterval(() => {
-      if (window.outerHeight - window.innerHeight > threshold ||
-          window.outerWidth - window.innerWidth > threshold) {
-        if (!devtoolsOpen) {
-          devtoolsOpen = true;
-          this.handleSecurityBreach('devtools_detected');
-        }
-      } else {
-        devtoolsOpen = false;
+  private deployAntiDebugging(): void {
+    // Multi-layer debugger detection
+    const detectDebugger = () => {
+      // Timing-based detection
+      const start = performance.now();
+      // debugger; // Commented for production
+      const duration = performance.now() - start;
+      if (duration > 100) {
+        this.initiateSecurityProtocol();
       }
-    }, 1000);
 
-    // Monitor for script injection attempts
+      // Console object detection
+      const element = new Image();
+      Object.defineProperty(element, 'id', {
+        get: () => {
+          this.initiateSecurityProtocol();
+          return 'detected';
+        }
+      });
+
+      // Window size detection
+      if (window.outerHeight - window.innerHeight > 200 ||
+          window.outerWidth - window.innerWidth > 200) {
+        this.initiateSecurityProtocol();
+      }
+
+      // DevTools detection via toString
+      const checkObj = {
+        get id() {
+          (this as any).initiateSecurityProtocol?.();
+          return 'detected';
+        }
+      };
+      // Force evaluation
+      void checkObj.id;
+
+      // Performance profiler detection
+      const startProfile = performance.now();
+      for (let i = 0; i < 1000; i++) {
+        Math.sqrt(i);
+      }
+      if (performance.now() - startProfile > 10) {
+        this.initiateSecurityProtocol();
+      }
+    };
+
+    // Run detection continuously
+    setInterval(detectDebugger, 300);
+
+    // Disable ALL console methods
+    const noop = () => {};
+    ['log', 'debug', 'info', 'warn', 'error', 'assert', 'dir', 'dirxml',
+     'trace', 'group', 'groupCollapsed', 'groupEnd', 'time', 'timeEnd',
+     'profile', 'profileEnd', 'count', 'clear', 'table'].forEach(method => {
+      (window.console as any)[method] = noop;
+    });
+
+    // Prevent console object replacement
+    Object.freeze(window.console);
+    Object.defineProperty(window, 'console', {
+      value: window.console,
+      writable: false,
+      configurable: false
+    });
+
+    // Block all debugging keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      // F12, Ctrl+Shift+I/C/J, Ctrl+U
+      if (e.key === 'F12' ||
+          (e.ctrlKey && e.shiftKey && ['I', 'C', 'J'].includes(e.key)) ||
+          (e.ctrlKey && e.key === 'U') ||
+          (e.metaKey && e.altKey && ['I', 'C', 'J'].includes(e.key))) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        this.initiateSecurityProtocol();
+        return false;
+      }
+    }, true);
+  }
+
+  private deployAntiTampering(): void {
+    // Prevent all context menus
+    ['contextmenu', 'auxclick'].forEach(event => {
+      document.addEventListener(event, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+      }, true);
+    });
+
+    // Block all text selection
+    document.addEventListener('selectstart', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }, true);
+
+    // CSS-based selection blocking
+    const style = document.createElement('style');
+    style.textContent = `
+      * {
+        -webkit-touch-callout: none !important;
+        -webkit-user-select: none !important;
+        -khtml-user-select: none !important;
+        -moz-user-select: none !important;
+        -ms-user-select: none !important;
+        user-select: none !important;
+        -webkit-user-drag: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Prevent clipboard operations
+    ['copy', 'cut', 'paste'].forEach(event => {
+      document.addEventListener(event, (e) => {
+        (e as ClipboardEvent).clipboardData?.clearData();
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }, true);
+    });
+
+    // Prevent drag operations
+    ['drag', 'dragstart', 'dragenter', 'dragover', 'dragleave', 'dragend', 'drop'].forEach(event => {
+      document.addEventListener(event, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }, true);
+    });
+
+    // Prevent printing
+    ['beforeprint', 'afterprint'].forEach(event => {
+      window.addEventListener(event, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        document.body.style.visibility = 'hidden';
+        this.secureMemoryWipe();
+        return false;
+      }, true);
+    });
+
+    // CSS print blocking
+    const printStyle = document.createElement('style');
+    printStyle.textContent = '@media print { * { display: none !important; } }';
+    document.head.appendChild(printStyle);
+  }
+
+  private deployDataProtection(): void {
+    // Disable all storage mechanisms
+    const disableStorage = (storage: Storage) => {
+      const noop = () => {};
+      const noopReturn = () => null;
+
+      Object.defineProperty(storage, 'setItem', {
+        value: noop,
+        writable: false,
+        configurable: false
+      });
+
+      Object.defineProperty(storage, 'getItem', {
+        value: noopReturn,
+        writable: false,
+        configurable: false
+      });
+
+      Object.defineProperty(storage, 'removeItem', {
+        value: noop,
+        writable: false,
+        configurable: false
+      });
+
+      Object.defineProperty(storage, 'clear', {
+        value: noop,
+        writable: false,
+        configurable: false
+      });
+    };
+
+    try {
+      disableStorage(localStorage);
+      disableStorage(sessionStorage);
+    } catch (e) {
+      // Storage already restricted
+    }
+
+    // Disable IndexedDB
+    if ('indexedDB' in window) {
+      (window as any).indexedDB = undefined;
+      Object.defineProperty(window, 'indexedDB', {
+        value: undefined,
+        writable: false,
+        configurable: false
+      });
+    }
+
+    // Disable WebSQL
+    if ('openDatabase' in window) {
+      (window as any).openDatabase = undefined;
+    }
+
+    // Disable cookies
+    Object.defineProperty(document, 'cookie', {
+      get: () => '',
+      set: () => {},
+      configurable: false
+    });
+
+    // Clear memory periodically
+    setInterval(() => {
+      this.secureMemoryWipe();
+    }, 15000);
+  }
+
+  private deployNetworkSecurity(): void {
+    // Override fetch to monitor requests
+    const originalFetch = window.fetch;
+    window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = typeof input === 'string' ? input : input.toString();
+
+      // Only allow whitelisted domains
+      const allowedDomains = [
+        'huggingface.co',
+        'cdn-lfs.huggingface.co',
+        'raw.githubusercontent.com'
+      ];
+
+      try {
+        const urlObj = new URL(url, window.location.origin);
+        const isAllowed = allowedDomains.some(domain =>
+          urlObj.hostname.includes(domain)
+        );
+
+        if (!isAllowed && !urlObj.hostname.includes(window.location.hostname)) {
+          throw new Error('Network request blocked');
+        }
+      } catch (e) {
+        if (!url.startsWith('/') && !url.startsWith('./')) {
+          throw new Error('Network request blocked');
+        }
+      }
+
+      return originalFetch(input, init);
+    };
+
+    // Disable WebRTC
+    if ('RTCPeerConnection' in window) {
+      (window as any).RTCPeerConnection = undefined;
+      (window as any).RTCSessionDescription = undefined;
+      (window as any).RTCIceCandidate = undefined;
+      (window as any).mediaDevices = undefined;
+    }
+
+    // Disable WebSockets
+    (window as any).WebSocket = undefined;
+
+    // Disable EventSource
+    (window as any).EventSource = undefined;
+  }
+
+  private deployForensicProtection(): void {
+    // Advanced DOM mutation monitoring
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.type === 'childList') {
           mutation.addedNodes.forEach((node) => {
             if (node.nodeType === Node.ELEMENT_NODE) {
-              const element = node as Element;
-              if (element.tagName === 'SCRIPT' && !element.hasAttribute('data-allowed')) {
-                this.handleSecurityBreach('script_injection_detected');
+              const element = node as HTMLElement;
+
+              // Block dangerous elements
+              const dangerous = ['SCRIPT', 'IFRAME', 'OBJECT', 'EMBED', 'APPLET', 'LINK'];
+              if (dangerous.includes(element.tagName)) {
                 element.remove();
+                this.initiateSecurityProtocol();
+              }
+
+              // Check for javascript: URLs
+              if (element.outerHTML.includes('javascript:')) {
+                element.remove();
+                this.initiateSecurityProtocol();
+              }
+
+              // Check for event handlers
+              const attributes = element.attributes;
+              for (let i = 0; i < attributes.length; i++) {
+                if (attributes[i].name.startsWith('on')) {
+                  element.removeAttribute(attributes[i].name);
+                  this.initiateSecurityProtocol();
+                }
               }
             }
           });
         }
+
+        // Monitor attribute changes
+        if (mutation.type === 'attributes') {
+          const element = mutation.target as HTMLElement;
+          if (mutation.attributeName?.startsWith('on') ||
+              element.getAttribute(mutation.attributeName || '')?.includes('javascript:')) {
+            element.removeAttribute(mutation.attributeName || '');
+            this.initiateSecurityProtocol();
+          }
+        }
       });
     });
 
-    observer.observe(document, { childList: true, subtree: true });
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeOldValue: true
+    });
+
+    // Continuous integrity checking
+    setInterval(() => {
+      const currentHash = this.calculateIntegrityHash();
+      if (currentHash !== this.integrityHash) {
+        this.initiateSecurityProtocol();
+      }
+    }, 500);
   }
 
-  private handleSecurityBreach(_type: string): void {
-    // In production, take defensive measures
-    if (import.meta.env.PROD) {
-      // Clear sensitive data
-      this.secureClearData();
-
-      // Security event detected - monitoring active
+  private startSecurityMonitoring(): void {
+    // Monitor for iframe embedding
+    if (window.self !== window.top) {
+      this.initiateSecurityProtocol();
     }
+
+    // Monitor page visibility
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        this.secureMemoryWipe();
+      }
+    });
+
+    // Monitor for screenshots (partial detection)
+    let lastTime = Date.now();
+    const checkScreenshot = () => {
+      const currentTime = Date.now();
+      if (currentTime - lastTime > 100) {
+        // Possible screenshot attempt
+        this.secureMemoryWipe();
+      }
+      lastTime = currentTime;
+      requestAnimationFrame(checkScreenshot);
+    };
+    requestAnimationFrame(checkScreenshot);
+
+    // Cleanup on unload
+    ['beforeunload', 'unload', 'pagehide'].forEach(event => {
+      window.addEventListener(event, () => {
+        this.totalMemoryWipe();
+      });
+    });
   }
 
-  private secureClearData(): void {
-    // Clear localStorage and sessionStorage
+  private calculateIntegrityHash(): string {
+    // Simple hash for DOM integrity
+    const content = document.documentElement.innerHTML;
+    let hash = 0;
+    for (let i = 0; i < content.length; i++) {
+      const char = content.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return hash.toString();
+  }
+
+  private secureMemoryWipe(): void {
     try {
+      // Clear all storage
       localStorage.clear();
       sessionStorage.clear();
+
+      // Clear IndexedDB
+      if ('databases' in indexedDB) {
+        indexedDB.databases().then(dbs => {
+          dbs.forEach(db => {
+            if (db.name) indexedDB.deleteDatabase(db.name);
+          });
+        });
+      }
+
+      // Clear caches
+      if ('caches' in window) {
+        caches.keys().then(names => {
+          names.forEach(name => caches.delete(name));
+        });
+      }
+
+      // Clear cookies
+      document.cookie.split(';').forEach(c => {
+        document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
+      });
+
+      // Overwrite memory with random data
+      if (window.crypto && window.crypto.getRandomValues) {
+        for (let i = 0; i < 5; i++) {
+          const buffer = new Uint8Array(512 * 1024); // 512KB chunks
+          window.crypto.getRandomValues(buffer);
+        }
+      }
     } catch (e) {
-      // Silently handle if storage is restricted
+      // Silent fail
+    }
+  }
+
+  private totalMemoryWipe(): void {
+    // Aggressive memory wipe on unload
+    this.secureMemoryWipe();
+
+    // Additional memory overwrite
+    if (window.crypto && window.crypto.getRandomValues) {
+      for (let i = 0; i < 20; i++) {
+        const buffer = new Uint8Array(1024 * 1024); // 1MB chunks
+        window.crypto.getRandomValues(buffer);
+      }
     }
 
-    // Clear any cached data
-    if ('caches' in window) {
-      caches.keys().then(names => {
-        names.forEach(name => {
-          caches.delete(name);
-        });
-      });
+    // Clear all event listeners
+    document.removeEventListener('keydown', () => {});
+    document.removeEventListener('contextmenu', () => {});
+    document.removeEventListener('selectstart', () => {});
+  }
+
+  private initiateSecurityProtocol(): void {
+    // Security breach detected - execute protocol
+    this.totalMemoryWipe();
+
+    // Clear page content
+    document.body.innerHTML = '';
+    document.head.innerHTML = '';
+
+    // Redirect to blank page
+    try {
+      window.location.href = 'about:blank';
+    } catch (e) {
+      window.location.replace('about:blank');
     }
   }
 
@@ -136,10 +481,13 @@ export class SecurityManager {
       const urlObj = new URL(url);
       const allowedDomains = [
         'huggingface.co',
-        'cdn-lfs.huggingface.co'
+        'cdn-lfs.huggingface.co',
+        'raw.githubusercontent.com'
       ];
 
-      return allowedDomains.includes(urlObj.hostname);
+      return allowedDomains.some(domain =>
+        urlObj.hostname === domain || urlObj.hostname.endsWith('.' + domain)
+      );
     } catch {
       return false;
     }

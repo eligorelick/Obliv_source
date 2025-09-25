@@ -14,19 +14,35 @@
     <meta name="twitter:description" content="True AI Privacy - No Servers, No Tracking, No Compromise" />
     <meta name="referrer" content="no-referrer" />
 
-    <!-- Content Security Policy: restrict scripts/styles/connects to allowed origins -->
+    <!-- Government-Grade Content Security Policy: Maximum restriction -->
     <meta http-equiv="Content-Security-Policy"
-      content="default-src 'none'; 
-               base-uri 'self'; 
-               script-src 'self' 'wasm-unsafe-eval'; 
-               worker-src 'self' blob:; 
-               connect-src 'self' https://huggingface.co https://cdn-lfs.huggingface.co https://*.huggingface.co https://cas-bridge.xethub.hf.co https://*.xethub.hf.co https://raw.githubusercontent.com https://github.com https://*.githubusercontent.com; 
-               img-src 'self' data:; 
-               style-src 'self' 'unsafe-inline'; 
-               font-src 'self' data:; 
-               form-action 'self'; 
-               object-src 'none'; 
-               upgrade-insecure-requests;" />
+      content="default-src 'none';
+               base-uri 'none';
+               script-src 'self' 'wasm-unsafe-eval';
+               worker-src 'self' blob:;
+               connect-src 'self' https://huggingface.co https://cdn-lfs.huggingface.co https://*.huggingface.co;
+               img-src 'self' data:;
+               style-src 'self' 'unsafe-inline';
+               font-src 'self';
+               form-action 'none';
+               frame-ancestors 'none';
+               object-src 'none';
+               media-src 'none';
+               manifest-src 'none';
+               prefetch-src 'none';
+               navigate-to 'self';
+               block-all-mixed-content;
+               upgrade-insecure-requests;
+               require-trusted-types-for 'script';" />
+
+    <!-- Additional Security Headers -->
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, private, max-age=0" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
 
     <!-- Small external script to set initial theme before React mounts -->
     <script src="/set-theme.js"></script>
@@ -34,9 +50,6 @@
     <!-- Preconnect to CDN for faster model loading -->
     <link rel="preconnect" href="https://huggingface.co" />
     <link rel="preconnect" href="https://cdn-lfs.huggingface.co" />
-    <link rel="preconnect" href="https://cas-bridge.xethub.hf.co" />
-    <link rel="preconnect" href="https://raw.githubusercontent.com" />
-    <link rel="preconnect" href="https://github.com" />
 
     <title>OBLIVAI - Private AI Chat | No Servers, No Tracking</title>
 
