@@ -68,8 +68,8 @@ export const sanitizeInput = (input: string): string => {
     /onsubmit\s*=/gi,
     /expression\s*\(/gi,
     /url\s*\(/gi,
-    /data:/gi,
-    /base64/gi
+    /data:(?:text|image|application|audio|video)\//gi,
+    /base64,/gi
   ];
 
   let sanitized = cleaned;
