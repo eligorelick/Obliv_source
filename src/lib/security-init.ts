@@ -69,12 +69,12 @@ export class SecurityManager {
       // Force evaluation
       void checkObj.id;
 
-      // Performance profiler detection
+      // Performance profiler detection (adjusted threshold)
       const startProfile = performance.now();
       for (let i = 0; i < 1000; i++) {
         Math.sqrt(i);
       }
-      if (performance.now() - startProfile > 10) {
+      if (performance.now() - startProfile > 50) { // Increased threshold
         this.initiateSecurityProtocol();
       }
     };
@@ -125,17 +125,20 @@ export class SecurityManager {
       }, true);
     });
 
-    // Block all text selection
+    // Block text selection except for input fields
     document.addEventListener('selectstart', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      return false;
+      const target = e.target as HTMLElement;
+      if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
     }, true);
 
-    // CSS-based selection blocking
+    // CSS-based selection blocking (except inputs)
     const style = document.createElement('style');
     style.textContent = `
-      * {
+      *:not(input):not(textarea) {
         -webkit-touch-callout: none !important;
         -webkit-user-select: none !important;
         -khtml-user-select: none !important;
@@ -143,6 +146,12 @@ export class SecurityManager {
         -ms-user-select: none !important;
         user-select: none !important;
         -webkit-user-drag: none !important;
+      }
+      input, textarea {
+        -webkit-user-select: text !important;
+        -moz-user-select: text !important;
+        -ms-user-select: text !important;
+        user-select: text !important;
       }
     `;
     document.head.appendChild(style);
@@ -184,42 +193,15 @@ export class SecurityManager {
   }
 
   private deployDataProtection(): void {
-    // Disable all storage mechanisms
-    const disableStorage = (storage: Storage) => {
-      const noop = () => {};
-      const noopReturn = () => null;
-
-      Object.defineProperty(storage, 'setItem', {
-        value: noop,
-        writable: false,
-        configurable: false
-      });
-
-      Object.defineProperty(storage, 'getItem', {
-        value: noopReturn,
-        writable: false,
-        configurable: false
-      });
-
-      Object.defineProperty(storage, 'removeItem', {
-        value: noop,
-        writable: false,
-        configurable: false
-      });
-
-      Object.defineProperty(storage, 'clear', {
-        value: noop,
-        writable: false,
-        configurable: false
-      });
-    };
-
-    try {
-      disableStorage(localStorage);
-      disableStorage(sessionStorage);
-    } catch (e) {
-      // Storage already restricted
-    }
+    // Clear storage on unload but allow temporary usage
+    window.addEventListener('beforeunload', () => {
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+      } catch (e) {
+        // Silent fail
+      }
+    });
 
     // Disable IndexedDB
     if ('indexedDB' in window) {
@@ -348,13 +330,13 @@ export class SecurityManager {
       attributeOldValue: true
     });
 
-    // Continuous integrity checking
-    setInterval(() => {
-      const currentHash = this.calculateIntegrityHash();
-      if (currentHash !== this.integrityHash) {
-        this.initiateSecurityProtocol();
-      }
-    }, 500);
+    // Continuous integrity checking (disabled for now to prevent false positives)
+    // setInterval(() => {
+    //   const currentHash = this.calculateIntegrityHash();
+    //   if (currentHash !== this.integrityHash) {
+    //     this.initiateSecurityProtocol();
+    //   }
+    // }, 500);
   }
 
   private startSecurityMonitoring(): void {
@@ -370,18 +352,18 @@ export class SecurityManager {
       }
     });
 
-    // Monitor for screenshots (partial detection)
-    let lastTime = Date.now();
-    const checkScreenshot = () => {
-      const currentTime = Date.now();
-      if (currentTime - lastTime > 100) {
-        // Possible screenshot attempt
-        this.secureMemoryWipe();
-      }
-      lastTime = currentTime;
-      requestAnimationFrame(checkScreenshot);
-    };
-    requestAnimationFrame(checkScreenshot);
+    // Monitor for screenshots (disabled to prevent performance issues)
+    // let lastTime = Date.now();
+    // const checkScreenshot = () => {
+    //   const currentTime = Date.now();
+    //   if (currentTime - lastTime > 100) {
+    //     // Possible screenshot attempt
+    //     this.secureMemoryWipe();
+    //   }
+    //   lastTime = currentTime;
+    //   requestAnimationFrame(checkScreenshot);
+    // };
+    // requestAnimationFrame(checkScreenshot);
 
     // Cleanup on unload
     ['beforeunload', 'unload', 'pagehide'].forEach(event => {

@@ -14,29 +14,31 @@
     <meta name="twitter:description" content="True AI Privacy - No Servers, No Tracking, No Compromise" />
     <meta name="referrer" content="no-referrer" />
 
-    <!-- Government-Grade Content Security Policy: Maximum restriction -->
+    <!-- Content Security Policy -->
     <meta http-equiv="Content-Security-Policy"
       content="default-src 'none';
-               base-uri 'none';
-               script-src 'self' 'wasm-unsafe-eval';
+               base-uri 'self';
+               script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline';
                worker-src 'self' blob:;
-               connect-src 'self' https://huggingface.co https://cdn-lfs.huggingface.co https://*.huggingface.co;
-               img-src 'self' data:;
+               connect-src 'self' 
+                 https://huggingface.co 
+                 https://cdn-lfs.huggingface.co 
+                 https://*.huggingface.co
+                 https://raw.githubusercontent.com
+                 https://*.githubusercontent.com;
+               img-src 'self' data: blob:;
                style-src 'self' 'unsafe-inline';
-               font-src 'self';
+               font-src 'self' data:;
                form-action 'none';
-               frame-ancestors 'none';
                object-src 'none';
-               media-src 'none';
-               manifest-src 'none';
-               prefetch-src 'none';
-               navigate-to 'self';
+               media-src 'self';
+               manifest-src 'self';
                block-all-mixed-content;
-               upgrade-insecure-requests;
-               require-trusted-types-for 'script';" />
+               upgrade-insecure-requests;" />
 
-    <!-- Additional Security Headers -->
-    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <!-- Note: X-Frame-Options should be set in server configuration -->
+    <!-- This is just a fallback -->
+    <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
     <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()" />

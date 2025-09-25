@@ -18,8 +18,9 @@ function App() {
   } = useChatStore();
 
   useEffect(() => {
-    // Initialize security measures
-    SecurityManager.getInstance();
+    // Initialize security measures with balanced settings
+    // Temporarily commenting out to debug UI issues
+    // SecurityManager.getInstance();
 
     // Set initial dark mode
     if (isDarkMode) {
