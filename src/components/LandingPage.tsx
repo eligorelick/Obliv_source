@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Lock, Laptop, Globe, Code, Zap, ArrowRight, Brain, Server, Eye } from 'lucide-react';
+import { Shield, Lock, Laptop, Globe, Code, Zap, ArrowRight, Server, Eye } from 'lucide-react';
 
 interface LandingPageProps {
   onStartChat: () => void;
@@ -74,7 +74,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartChat }) => {
 
         <div className="mx-auto max-w-4xl text-center">
           <div className="mb-6 sm:mb-8 flex justify-center">
-            <Brain className="h-16 w-16 sm:h-20 sm:w-20 text-primary" />
+            <div className="h-16 w-16 sm:h-20 sm:w-20 bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center shadow-2xl">
+              <img
+                src="/Whitelogotransparentbg.png"
+                alt="OBLIVAI"
+                className="w-12 h-12 sm:w-16 sm:h-16 object-contain"
+              />
+            </div>
           </div>
 
           <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight text-white mb-4 sm:mb-6">
@@ -196,21 +202,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartChat }) => {
               No user data, conversations, or personal information ever leaves your device.
               This isn't just a promise - it's architecturally impossible for us to access your data.
             </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 px-4">
+            <div className="flex justify-center px-4">
               <button
                 onClick={onStartChat}
-                className="gradient-primary px-6 py-3 rounded-xl text-white font-semibold hover:opacity-90 transition w-full sm:w-auto"
+                className="gradient-primary px-8 py-3 rounded-xl text-white font-semibold hover:opacity-90 transition transform hover:scale-105"
               >
                 Try It Now
               </button>
-              <a
-                href="https://github.com/eligorelick/oblivai"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="glass px-6 py-3 rounded-xl text-white font-semibold glass-hover transition text-center w-full sm:w-auto"
-              >
-                View Source Code
-              </a>
             </div>
           </div>
         </div>

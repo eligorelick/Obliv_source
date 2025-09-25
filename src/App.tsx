@@ -4,8 +4,8 @@ import { ModelSelector } from './components/ModelSelector';
 import { ChatInterface } from './components/ChatInterface';
 import { WebLLMService } from './lib/webllm-service';
 import { useChatStore } from './store/chat-store';
+import { SecurityManager } from './lib/security-init';
 import type { ModelConfig } from './lib/model-config';
-import * as webllm from '@mlc-ai/web-llm';
 
 function App() {
   const [currentView, setCurrentView] = useState<'landing' | 'model-select' | 'chat'>('landing');
@@ -18,6 +18,9 @@ function App() {
   } = useChatStore();
 
   useEffect(() => {
+    // Initialize security measures
+    SecurityManager.getInstance();
+
     // Set initial dark mode
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -33,19 +36,21 @@ function App() {
     setModelLoadingProgress(0, 'Initializing model...');
 
     try {
+      // Set up progress callback that handles both number and InitProgressReport
+      const progressCallback = (progress: number, status: string) => {
+        setModelLoadingProgress(progress, status);
+      };
+
       await webllmService.current.initializeModel(
         model,
-        (report: webllm.InitProgressReport) => {
-          const progress = report.progress * 100;
-          setModelLoadingProgress(progress, report.text);
-        }
+        progressCallback
       );
 
       // Once model is loaded, switch to chat view
       setCurrentView('chat');
       setModelLoadingProgress(100, 'Model loaded successfully');
     } catch (error) {
-      console.error('Failed to load model:', error);
+      // Failed to load model
       setModelLoadingProgress(0, `Failed to load model: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
@@ -54,7 +59,7 @@ function App() {
   useEffect(() => {
     const currentService = webllmService.current;
     return () => {
-      currentService.cleanup();
+      currentService.dispose();
     };
   }, []);
 
@@ -71,12 +76,14 @@ function App() {
             isLoading={webllmService.current.getLoadingStatus()}
             loadingProgress={useChatStore.getState().modelLoadingProgress}
             loadingStatus={useChatStore.getState().modelLoadingStatus}
+            // Provide back navigation
+            onBack={() => setCurrentView('landing')}
           />
         </div>
       )}
 
       {currentView === 'chat' && (
-        <ChatInterface webllmService={webllmService.current} />
+        <ChatInterface webllmService={webllmService.current} onBack={() => setCurrentView('model-select')} />
       )}
     </div>
   );

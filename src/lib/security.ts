@@ -1,43 +1,123 @@
 import DOMPurify from 'dompurify';
 
-// Prevent prompt injection and XSS
+// Maximum security input sanitization with comprehensive attack prevention
 export const sanitizeInput = (input: string): string => {
-  // Remove any HTML/script tags
+  // Input length validation - prevent DoS attacks
+  if (input.length > 10000) {
+    throw new Error('Input too long');
+  }
+
+  // Remove any HTML/script tags with strictest settings
   const cleaned = DOMPurify.sanitize(input, {
     ALLOWED_TAGS: [],
     ALLOWED_ATTR: [],
-    KEEP_CONTENT: true
+    KEEP_CONTENT: true,
+    FORBID_TAGS: ['script', 'object', 'embed', 'applet', 'iframe', 'form', 'input', 'textarea', 'button', 'select', 'option'],
+    FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur', 'onchange', 'onsubmit']
   });
 
-  // Prevent prompt injection patterns
+  // Comprehensive prompt injection prevention
   const injectionPatterns = [
     /ignore previous instructions/gi,
+    /forget everything/gi,
+    /new instructions/gi,
     /system:/gi,
+    /assistant:/gi,
+    /human:/gi,
+    /user:/gi,
     /\[INST\]/gi,
     /<\|im_start\|>/gi,
     /\[\/INST\]/gi,
     /<\|im_end\|>/gi,
     /###.*?system/gi,
-    /###.*?instruction/gi
+    /###.*?instruction/gi,
+    /###.*?assistant/gi,
+    /###.*?human/gi,
+    /###.*?user/gi,
+    /<\|user\|>/gi,
+    /<\|assistant\|>/gi,
+    /<\|system\|>/gi,
+    /\[system\]/gi,
+    /\[\/system\]/gi,
+    /\[user\]/gi,
+    /\[\/user\]/gi,
+    /\[assistant\]/gi,
+    /\[\/assistant\]/gi,
+    /jailbreak/gi,
+    /roleplay/gi,
+    /pretend/gi,
+    /act as/gi,
+    /simulate/gi,
+    /override/gi,
+    /bypass/gi,
+    /disable safety/gi,
+    /ignore safety/gi,
+    /remove restrictions/gi,
+    /unrestricted/gi,
+    /uncensored/gi
+  ];
+
+  // SQL injection patterns
+  const sqlPatterns = [
+    /union\s+select/gi,
+    /drop\s+table/gi,
+    /insert\s+into/gi,
+    /delete\s+from/gi,
+    /update\s+set/gi,
+    /create\s+table/gi,
+    /alter\s+table/gi,
+    /exec\s*\(/gi,
+    /xp_cmdshell/gi,
+    /sp_executesql/gi
+  ];
+
+  // XSS patterns
+  const xssPatterns = [
+    /<script/gi,
+    /<\/script>/gi,
+    /javascript:/gi,
+    /vbscript:/gi,
+    /onload\s*=/gi,
+    /onerror\s*=/gi,
+    /onclick\s*=/gi,
+    /onmouseover\s*=/gi,
+    /onfocus\s*=/gi,
+    /onblur\s*=/gi,
+    /onchange\s*=/gi,
+    /onsubmit\s*=/gi,
+    /expression\s*\(/gi,
+    /url\s*\(/gi,
+    /data:/gi,
+    /base64/gi
   ];
 
   let sanitized = cleaned;
-  injectionPatterns.forEach(pattern => {
-    sanitized = sanitized.replace(pattern, '[BLOCKED]');
+
+  // Apply all security patterns
+  [...injectionPatterns, ...sqlPatterns, ...xssPatterns].forEach(pattern => {
+    sanitized = sanitized.replace(pattern, '[SECURITY_BLOCKED]');
   });
+
+  // Remove null bytes and control characters
+  sanitized = sanitized.replace(/[\x00-\x1F\x7F-\x9F]/g, '');
+
+  // Remove excessive whitespace
+  sanitized = sanitized.replace(/\s{10,}/g, ' ').trim();
 
   return sanitized;
 };
 
 // Sanitize markdown output from models
 export const sanitizeMarkdown = (content: string): string => {
+  // Be conservative about allowed HTML in model outputs
   return DOMPurify.sanitize(content, {
     ALLOWED_TAGS: [
       'p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'blockquote', 'code', 'pre', 'ol', 'ul', 'li', 'a', 'img'
+      'blockquote', 'code', 'pre', 'ol', 'ul', 'li', 'a'
     ],
-    ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class'],
-    ALLOW_DATA_ATTR: false
+    ALLOWED_ATTR: ['href', 'title'],
+    ALLOW_DATA_ATTR: false,
+    FORBID_TAGS: ['img', 'script', 'iframe', 'object', 'embed']
   });
 };
 
@@ -70,3 +150,20 @@ export class RateLimiter {
     return Math.max(0, this.windowMs - (Date.now() - oldest));
   }
 }
+
+// Open external links safely by forcing rel attributes and target
+export const openExternal = (url: string) => {
+  try {
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer nofollow';
+    // Append and click to ensure it's treated as a user gesture
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  } catch (e) {
+    // fallback
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+};

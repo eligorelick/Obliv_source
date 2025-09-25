@@ -2,15 +2,17 @@ import React from 'react';
 import { MessageList } from './MessageList';
 import { InputArea } from './InputArea';
 import { ChatHeader } from './ChatHeader';
+import { sanitizeInput } from '../lib/security';
 import { useChatStore } from '../store/chat-store';
 import { WebLLMService } from '../lib/webllm-service';
 import type { ChatMessage } from '../lib/webllm-service';
 
 interface ChatInterfaceProps {
   webllmService: WebLLMService;
+  onBack?: () => void;
 }
 
-export const ChatInterface: React.FC<ChatInterfaceProps> = ({ webllmService }) => {
+export const ChatInterface: React.FC<ChatInterfaceProps> = ({ webllmService, onBack }) => {
   const {
     messages,
     isGenerating,
@@ -18,16 +20,20 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ webllmService }) =
     setGenerating,
     selectedModel
   } = useChatStore();
+  const systemInstruction = useChatStore(state => state.systemInstruction);
 
   const handleSendMessage = async (content: string) => {
     if (!selectedModel || !webllmService.isModelLoaded()) {
       return;
     }
 
+    // Sanitize user input before sending to the model
+    const cleaned = sanitizeInput(content).slice(0, 4000);
+
     // Add user message
     const userMessage: ChatMessage = {
       role: 'user',
-      content,
+      content: cleaned,
       timestamp: new Date()
     };
     addMessage(userMessage);
@@ -60,7 +66,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ webllmService }) =
               { ...assistantMessage, content: assistantContent }
             ]
           }));
-        }
+        },
+        undefined,
+        systemInstruction
       );
     } catch (error) {
       console.error('Error generating response:', error);
@@ -83,7 +91,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ webllmService }) =
 
   return (
     <div className="flex flex-col h-screen bg-dark">
-      <ChatHeader />
+      <ChatHeader onBack={onBack} />
 
       <div className="flex-1 overflow-hidden flex flex-col max-w-6xl mx-auto w-full px-2 sm:px-4">
         <MessageList messages={messages} />

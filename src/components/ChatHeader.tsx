@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Brain,
   Trash2,
   Download,
   Moon,
@@ -11,13 +10,17 @@ import {
 } from 'lucide-react';
 import { useChatStore } from '../store/chat-store';
 
-export const ChatHeader: React.FC = () => {
+interface ChatHeaderProps {
+  onBack?: () => void;
+}
+
+export const ChatHeader: React.FC<ChatHeaderProps> = ({ onBack }) => {
   const {
     messages,
     selectedModel,
     isDarkMode,
     autoDeleteChats,
-    clearMessages,
+    clearAllHistory,
     toggleDarkMode,
     setAutoDeleteChats,
     exportChat
@@ -25,6 +28,29 @@ export const ChatHeader: React.FC = () => {
 
   const [showSettings, setShowSettings] = React.useState(false);
   const [showClearConfirm, setShowClearConfirm] = React.useState(false);
+  const systemInstruction = useChatStore(state => state.systemInstruction);
+  const setSystemInstruction = useChatStore(state => state.setSystemInstruction);
+  const [tempInstruction, setTempInstruction] = React.useState(systemInstruction || '');
+  const [showExamples, setShowExamples] = React.useState(false);
+  // Storage is intentionally disabled in this build; in-memory only.
+
+  const PRESETS: { id: string; label: string; text: string }[] = [
+    {
+      id: 'concise',
+      label: 'Concise',
+      text: 'Answer succinctly and directly. Keep responses short and to the point.'
+    },
+    {
+      id: 'detailed',
+      label: 'Detailed',
+      text: 'Provide thorough and detailed answers. Explain reasoning and include examples when helpful.'
+    },
+    {
+      id: 'clarify',
+      label: 'Ask for clarification',
+      text: 'When the user query is ambiguous, ask clarifying questions before answering.'
+    }
+  ];
 
   const handleExport = () => {
     const markdown = exportChat();
@@ -42,7 +68,7 @@ export const ChatHeader: React.FC = () => {
   };
 
   const confirmClear = () => {
-    clearMessages();
+    clearAllHistory();
     setShowClearConfirm(false);
   };
 
@@ -51,8 +77,19 @@ export const ChatHeader: React.FC = () => {
       <header className="glass border-b border-white/10">
         <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-              <Brain className="h-6 w-6 sm:h-8 sm:w-8 text-primary flex-shrink-0" />
+              <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+              {onBack && (
+                <button onClick={onBack} className="glass p-2 rounded-lg glass-hover mr-2">
+                  ←
+                </button>
+              )}
+              <div className="h-6 w-6 sm:h-8 sm:w-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center flex-shrink-0">
+                <img
+                  src="/Whitelogotransparentbg.png"
+                  alt="OBLIVAI"
+                  className="w-4 h-4 sm:w-6 sm:h-6 object-contain"
+                />
+              </div>
               <div className="min-w-0 flex-1">
                 <h1 className="text-lg sm:text-xl font-bold text-white">OBLIVAI</h1>
                 <p className="text-xs text-gray-400 truncate">
@@ -66,13 +103,13 @@ export const ChatHeader: React.FC = () => {
             <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
               <button
                 onClick={toggleDarkMode}
-                className="glass p-2 rounded-lg glass-hover hidden sm:flex"
+                className="glass p-2 rounded-lg glass-hover"
                 aria-label="Toggle theme"
               >
                 {isDarkMode ? (
-                  <Sun className="h-5 w-5 text-gray-300" />
+                  <Sun className="h-4 w-4 sm:h-5 sm:w-5 text-gray-300" />
                 ) : (
-                  <Moon className="h-5 w-5 text-gray-300" />
+                  <Moon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-300" />
                 )}
               </button>
 
@@ -123,6 +160,80 @@ export const ChatHeader: React.FC = () => {
             </div>
 
             <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-white font-medium mb-2">Assistant Instructions</label>
+                <div className="flex items-center gap-2 mb-2">
+                  {PRESETS.map(p => (
+                    <button
+                      key={p.id}
+                      onClick={() => setTempInstruction(p.text)}
+                      className="glass px-2 py-1 rounded-md text-sm text-white"
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+
+                  <div className="ml-auto relative">
+                    <button
+                      onClick={() => setShowExamples(!showExamples)}
+                      className="glass px-2 py-1 rounded-md text-sm text-white"
+                    >
+                      Examples
+                    </button>
+
+                    {showExamples && (
+                      <div className="absolute right-0 mt-2 w-64 glass rounded-md p-3 z-50">
+                        <p className="text-xs text-gray-300 mb-2">Try these examples:</p>
+                        <ul className="space-y-2 text-sm">
+                          <li>
+                            <button onClick={() => setTempInstruction('You are an expert assistant. Provide concise and accurate answers.')}
+                              className="text-left w-full">
+                              Expert concise helper
+                            </button>
+                          </li>
+                          <li>
+                            <button onClick={() => setTempInstruction('You are an assistant that always asks clarifying questions when intent is unclear.')}
+                              className="text-left w-full">
+                              Clarify intent
+                            </button>
+                          </li>
+                          <li>
+                            <button onClick={() => setTempInstruction('Always provide step-by-step instructions when explaining how to perform tasks.')}
+                              className="text-left w-full">
+                              Step-by-step instructions
+                            </button>
+                          </li>
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <textarea
+                  value={tempInstruction}
+                  onChange={(e) => setTempInstruction(e.target.value)}
+                  className="w-full glass rounded-md p-3 text-sm text-white placeholder-gray-500 h-28"
+                  placeholder="Give initial directions to the assistant, e.g. 'Answer all user questions succinctly and ask clarifying questions when needed.'"
+                />
+                <div className="flex gap-2 mt-2">
+                  <button
+                    onClick={() => {
+                      setSystemInstruction(tempInstruction || '');
+                    }}
+                    className="glass px-3 py-2 rounded-md text-white"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={() => {
+                      setTempInstruction(systemInstruction || '');
+                    }}
+                    className="glass px-3 py-2 rounded-md text-white"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Shield className="h-5 w-5 text-accent" />
@@ -140,6 +251,16 @@ export const ChatHeader: React.FC = () => {
                   />
                   <div className="w-11 h-6 bg-gray-700 peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                 </label>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <Shield className="h-5 w-5 text-accent" />
+                    <div>
+                      <p className="text-white font-medium">Storage disabled (privacy)</p>
+                      <p className="text-xs text-gray-400">This build enforces in-memory only operation; no localStorage, Cache, or IndexedDB writes occur.</p>
+                    </div>
+                  </div>
               </div>
 
               <div className="glass rounded-lg p-4 border-green-500/30 bg-green-500/10">

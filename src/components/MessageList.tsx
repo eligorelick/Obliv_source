@@ -21,7 +21,7 @@ export const MessageList: React.FC<MessageListProps> = ({ messages }) => {
       setCopiedIndex(index);
       setTimeout(() => setCopiedIndex(null), 2000);
     } catch (err) {
-      console.error('Failed to copy text:', err);
+      // Failed to copy text
     }
   };
 

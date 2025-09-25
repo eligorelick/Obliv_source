@@ -6,28 +6,65 @@
   :root {
     --dark: #0F0F23;
     --dark-lighter: #1A1A2E;
+    --light: #FFFFFF;
+    --light-darker: #F8F9FA;
     --primary: #8B5CF6;
     --primary-dark: #6D28D9;
     --accent: #06B6D4;
+
+    /* Dark mode variables (default) */
+    --background: var(--dark);
+    --background-lighter: var(--dark-lighter);
+    --text-primary: #FFFFFF;
+    --text-secondary: #D1D5DB;
+    --text-muted: #9CA3AF;
+    --border: rgba(255, 255, 255, 0.1);
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+  }
+
+  .light {
+    /* Light mode variables */
+    --background: var(--light);
+    --background-lighter: var(--light-darker);
+    --text-primary: #111827;
+    --text-secondary: #374151;
+    --text-muted: #6B7280;
+    --border: rgba(0, 0, 0, 0.1);
+    --glass-bg: rgba(255, 255, 255, 0.8);
+    --glass-border: rgba(0, 0, 0, 0.1);
   }
 
   body {
-    background-color: var(--dark);
-    color: white;
+    background-color: var(--background);
+    color: var(--text-primary);
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
 
 @layer utilities {
-  .bg-dark {
-    background-color: var(--dark);
+  .bg-theme {
+    background-color: var(--background);
   }
 
-  .bg-dark-lighter {
-    background-color: var(--dark-lighter);
+  .bg-theme-lighter {
+    background-color: var(--background-lighter);
   }
 
-  .text-primary {
+  .text-theme-primary {
+    color: var(--text-primary);
+  }
+
+  .text-theme-secondary {
+    color: var(--text-secondary);
+  }
+
+  .text-theme-muted {
+    color: var(--text-muted);
+  }
+
+  .text-primary-brand {
     color: var(--primary);
   }
 
@@ -36,17 +73,23 @@
   }
 
   .glass {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: var(--glass-bg);
     backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--glass-border);
+    transition: all 0.3s ease;
   }
 
   .glass-hover {
-    transition: background-color 0.2s;
+    transition: background-color 0.2s ease;
   }
 
   .glass-hover:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--glass-bg);
+    filter: brightness(1.1);
+  }
+
+  .border-theme {
+    border-color: var(--border);
   }
 
   .gradient-primary {
@@ -58,5 +101,47 @@
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
+  }
+
+  /* Dark mode specific styles */
+  .bg-dark {
+    background-color: var(--dark);
+  }
+
+  .bg-dark-lighter {
+    background-color: var(--dark-lighter);
+  }
+
+  /* Animation classes */
+  .theme-transition {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
   }
 }

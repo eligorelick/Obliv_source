@@ -11,13 +11,15 @@ interface ModelSelectorProps {
   isLoading: boolean;
   loadingProgress: number;
   loadingStatus: string;
+  onBack?: () => void;
 }
 
 export const ModelSelector: React.FC<ModelSelectorProps> = ({
   onModelSelect,
   isLoading,
   loadingProgress,
-  loadingStatus
+  loadingStatus,
+  onBack
 }) => {
   const [hardware, setHardware] = useState<HardwareInfo | null>(null);
   const [detecting, setDetecting] = useState(true);
@@ -30,7 +32,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
     });
   }, []);
 
-  const getModelStatus = (modelKey: 'tiny' | 'medium' | 'large' | 'xl' | 'uncensored') => {
+  const getModelStatus = (modelKey: 'tiny' | 'medium' | 'large' | 'xl' | 'uncensored' | 'hermes_7b' | 'hermes_8b' | 'deepseek_7b' | 'deepseek_8b') => {
     if (!hardware) return 'checking';
 
     const model = MODELS[modelKey];
@@ -84,6 +86,22 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
 
   return (
     <div className="w-full max-w-6xl mx-auto p-4 sm:p-6">
+      <div className="mb-4">
+        <div className="flex items-center gap-3">
+          {onBack && (
+            <button onClick={onBack} className="glass p-2 rounded-lg glass-hover">
+              Back
+            </button>
+          )}
+          <div className="h-8 w-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
+            <img
+              src="/Whitelogotransparentbg.png"
+              alt="OBLIVAI"
+              className="w-6 h-6 object-contain"
+            />
+          </div>
+        </div>
+      </div>
       <div className="text-center mb-6 sm:mb-8">
         <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4">Choose Your AI Model</h2>
         <p className="text-sm sm:text-base text-gray-400">Select a model based on your device capabilities</p>
@@ -91,21 +109,57 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
 
       {/* Hardware Info */}
       {hardware && (
-        <div className="glass rounded-xl p-3 sm:p-4 mb-6 sm:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <Cpu className="h-4 w-4 sm:h-5 sm:w-5 text-accent flex-shrink-0" />
-            <span className="text-xs sm:text-sm text-gray-300">
-              Your Device: {hardware.memory}GB RAM • {hardware.cores} Cores •{' '}
-              {hardware.hasWebGPU ? 'WebGPU Enabled' : 'CPU Only'}
-            </span>
+        <div className="glass rounded-xl p-4 sm:p-5 mb-6 sm:mb-8">
+          <div className="flex flex-col gap-2 sm:gap-3">
+            <div className="flex items-center gap-3">
+              <Cpu className="h-4 w-4 sm:h-5 sm:w-5 text-accent flex-shrink-0" />
+              <h3 className="text-sm sm:text-base font-medium text-white">Your Device</h3>
+              {detecting && <Loader2 className="h-3 w-3 animate-spin text-primary" />}
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400">CPU Cores:</span>
+                <span className="text-gray-200">{hardware.cores}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400">System RAM:</span>
+                <span className="text-gray-200">{hardware.memory}GB</span>
+              </div>
+              {hardware.gpuInfo && (
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-400">GPU:</span>
+                  <span className="text-gray-200">
+                    {hardware.gpuInfo.name}
+                    {hardware.gpuInfo.vram && ` (${hardware.gpuInfo.vram}GB VRAM)`}
+                  </span>
+                </div>
+              )}
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400">Acceleration:</span>
+                <span className="text-gray-200">
+                  {hardware.hasWebGPU 
+                    ? 'WebGPU Enabled' 
+                    : hardware.gpuInfo 
+                      ? 'GPU (No WebGPU)' 
+                      : 'CPU Only'}
+                </span>
+              </div>
+            </div>
+            
+            {hardware.deviceType === 'desktop' && hardware.gpuInfo?.isHighPerformance && (
+              <div className="mt-2 text-xs text-green-400 flex items-center gap-1">
+                <Zap className="h-3 w-3" />
+                High-performance GPU detected
+              </div>
+            )}
           </div>
-          {detecting && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
         </div>
       )}
 
       {/* Model Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6">
-        {(Object.keys(MODELS) as Array<'tiny' | 'medium' | 'large' | 'xl' | 'uncensored'>).map(modelKey => {
+        {(Object.keys(MODELS) as Array<'tiny' | 'medium' | 'large' | 'xl' | 'uncensored' | 'hermes_7b' | 'hermes_8b' | 'deepseek_7b' | 'deepseek_8b'>).map(modelKey => {
           const model = MODELS[modelKey];
           const status = getModelStatus(modelKey);
           const isSelected = selectedModel?.id === model.id;
@@ -150,25 +204,36 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
               {isSelected && isLoading && (
                 <div className="mt-4">
                   <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
-                    <span className="truncate pr-2">{loadingStatus}</span>
-                    <span className="font-mono flex-shrink-0">{Math.round(loadingProgress)}%</span>
+                    <span className="truncate pr-2 animate-pulse">{loadingStatus}</span>
+                    <span className="font-mono flex-shrink-0 font-bold text-primary">{Math.round(loadingProgress)}%</span>
                   </div>
-                  <div className="w-full bg-gray-700 rounded-full h-2 sm:h-3 overflow-hidden">
+                  <div className="w-full bg-gray-700/50 rounded-full h-3 sm:h-4 overflow-hidden shadow-inner">
                     <div className="relative h-full">
                       <div
-                        className="gradient-primary h-full transition-all duration-500 ease-out"
-                        style={{ width: `${loadingProgress}%` }}
+                        className="gradient-primary h-full transition-all duration-300 ease-out shadow-lg"
+                        style={{
+                          width: `${loadingProgress}%`,
+                          boxShadow: loadingProgress > 0 ? '0 0 10px rgba(99, 102, 241, 0.5)' : 'none'
+                        }}
                       />
                       {loadingProgress > 0 && loadingProgress < 100 && (
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+                        <>
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+                          <div className="absolute right-0 top-0 h-full w-2 bg-white/40 animate-pulse"
+                               style={{ left: `${Math.max(0, loadingProgress - 2)}%` }} />
+                        </>
                       )}
                     </div>
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    {loadingProgress < 30 && 'Downloading model...'}
-                    {loadingProgress >= 30 && loadingProgress < 70 && 'Loading into memory...'}
-                    {loadingProgress >= 70 && loadingProgress < 100 && 'Initializing...'}
-                    {loadingProgress >= 100 && 'Ready!'}
+                  <div className="text-xs text-gray-400 mt-2 flex items-center gap-2">
+                    {loadingProgress < 100 && (
+                      <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+                    )}
+                    <span className="font-medium">
+                      {loadingProgress === 0 && 'Preparing to load...'}
+                      {loadingProgress > 0 && loadingProgress < 100 && loadingStatus}
+                      {loadingProgress >= 100 && '✓ Model ready!'}
+                    </span>
                   </div>
                 </div>
               )}

@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="icon" type="image/png" href="/Whitelogotransparentbg.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="OBLIVAI - True AI Privacy. Chat with AI models running entirely in your browser. No servers, no tracking, no compromise." />
     <meta name="keywords" content="private AI, local AI, browser AI, WebLLM, privacy-first chat, no tracking" />
@@ -12,20 +12,52 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="OBLIVAI - Private AI Chat" />
     <meta name="twitter:description" content="True AI Privacy - No Servers, No Tracking, No Compromise" />
+    <meta name="referrer" content="no-referrer" />
+
+    <!-- Content Security Policy: restrict scripts/styles/connects to allowed origins -->
+    <meta http-equiv="Content-Security-Policy"
+      content="default-src 'none'; 
+               base-uri 'self'; 
+               script-src 'self' 'wasm-unsafe-eval'; 
+               worker-src 'self' blob:; 
+               connect-src 'self' https://huggingface.co https://cdn-lfs.huggingface.co https://*.huggingface.co https://cas-bridge.xethub.hf.co https://*.xethub.hf.co https://raw.githubusercontent.com https://github.com https://*.githubusercontent.com; 
+               img-src 'self' data:; 
+               style-src 'self' 'unsafe-inline'; 
+               font-src 'self' data:; 
+               form-action 'self'; 
+               object-src 'none'; 
+               upgrade-insecure-requests;" />
+
+    <!-- Small external script to set initial theme before React mounts -->
+    <script src="/set-theme.js"></script>
 
     <!-- Preconnect to CDN for faster model loading -->
     <link rel="preconnect" href="https://huggingface.co" />
     <link rel="preconnect" href="https://cdn-lfs.huggingface.co" />
+    <link rel="preconnect" href="https://cas-bridge.xethub.hf.co" />
+    <link rel="preconnect" href="https://raw.githubusercontent.com" />
+    <link rel="preconnect" href="https://github.com" />
 
     <title>OBLIVAI - Private AI Chat | No Servers, No Tracking</title>
 
-    <!-- Inter font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Local-first fonts: removed external Google Fonts for privacy (use system fonts fallback) -->
   </head>
   <body>
     <div id="root"></div>
+
+    <noscript>
+      <style>
+        body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: #0F0F23; color: #FFFFFF; }
+        .noscript-container { max-width: 800px; margin: 64px auto; padding: 24px; background: rgba(255,255,255,0.03); border-radius: 12px; }
+        a { color: #8B5CF6 }
+      </style>
+      <div class="noscript-container">
+        <h1>OBLIVAI</h1>
+        <p>This site prefers to run entirely in your browser. JavaScript is required for the interactive private chat experience.</p>
+        <p>JavaScript is required for this application to function. Please enable JavaScript in your browser settings.</p>
+        <p>No data is stored or sent to us unless you explicitly enable it in the application.</p>
+      </div>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
