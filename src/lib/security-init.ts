@@ -2,7 +2,6 @@
 export class SecurityManager {
   private static instance: SecurityManager;
   private securityEnabled = true;
-  private integrityHash: string = '';
 
   private constructor() {
     this.initializeMaximumSecurity();
@@ -18,9 +17,6 @@ export class SecurityManager {
   private initializeMaximumSecurity(): void {
     // Immediate memory sanitization
     this.secureMemoryWipe();
-
-    // Calculate initial page integrity
-    this.integrityHash = this.calculateIntegrityHash();
 
     // Deploy all security measures
     this.deployAntiDebugging();
@@ -331,11 +327,6 @@ export class SecurityManager {
     });
 
     // Continuous integrity checking (disabled for now to prevent false positives)
-    // setInterval(() => {
-    //   const currentHash = this.calculateIntegrityHash();
-    //   if (currentHash !== this.integrityHash) {
-    //     this.initiateSecurityProtocol();
-    //   }
     // }, 500);
   }
 
@@ -371,18 +362,6 @@ export class SecurityManager {
         this.totalMemoryWipe();
       });
     });
-  }
-
-  private calculateIntegrityHash(): string {
-    // Simple hash for DOM integrity
-    const content = document.documentElement.innerHTML;
-    let hash = 0;
-    for (let i = 0; i < content.length; i++) {
-      const char = content.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash;
-    }
-    return hash.toString();
   }
 
   private secureMemoryWipe(): void {
@@ -446,7 +425,6 @@ export class SecurityManager {
     // Security breach detected - execute protocol
     this.totalMemoryWipe();
 
-    // Clear page content
     document.body.innerHTML = '';
     document.head.innerHTML = '';
 

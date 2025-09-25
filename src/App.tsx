@@ -4,7 +4,6 @@ import { ModelSelector } from './components/ModelSelector';
 import { ChatInterface } from './components/ChatInterface';
 import { WebLLMService } from './lib/webllm-service';
 import { useChatStore } from './store/chat-store';
-import { SecurityManager } from './lib/security-init';
 import type { ModelConfig } from './lib/model-config';
 
 function App() {
@@ -14,7 +13,9 @@ function App() {
   const {
     setSelectedModel,
     setModelLoadingProgress,
-    isDarkMode
+    isDarkMode,
+    modelLoadingProgress,
+    modelLoadingStatus
   } = useChatStore();
 
   useEffect(() => {
@@ -75,8 +76,8 @@ function App() {
           <ModelSelector
             onModelSelect={handleModelSelect}
             isLoading={webllmService.current.getLoadingStatus()}
-            loadingProgress={useChatStore.getState().modelLoadingProgress}
-            loadingStatus={useChatStore.getState().modelLoadingStatus}
+            loadingProgress={modelLoadingProgress}
+            loadingStatus={modelLoadingStatus}
             // Provide back navigation
             onBack={() => setCurrentView('landing')}
           />
