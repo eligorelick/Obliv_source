@@ -16,45 +16,26 @@ export const sanitizeInput = (input: string): string => {
     FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur', 'onchange', 'onsubmit']
   });
 
-  // Comprehensive prompt injection prevention
+  // Comprehensive prompt injection prevention - more targeted patterns
   const injectionPatterns = [
     /ignore previous instructions/gi,
     /forget everything/gi,
-    /new instructions/gi,
-    /system:/gi,
-    /assistant:/gi,
-    /human:/gi,
-    /user:/gi,
+    /new instructions:/gi,
     /\[INST\]/gi,
     /<\|im_start\|>/gi,
     /\[\/INST\]/gi,
     /<\|im_end\|>/gi,
-    /###.*?system/gi,
-    /###.*?instruction/gi,
-    /###.*?assistant/gi,
-    /###.*?human/gi,
-    /###.*?user/gi,
-    /<\|user\|>/gi,
-    /<\|assistant\|>/gi,
+    /###\s*system:/gi,
+    /###\s*instruction:/gi,
     /<\|system\|>/gi,
     /\[system\]/gi,
     /\[\/system\]/gi,
-    /\[user\]/gi,
-    /\[\/user\]/gi,
-    /\[assistant\]/gi,
-    /\[\/assistant\]/gi,
     /jailbreak/gi,
-    /roleplay/gi,
-    /pretend/gi,
-    /act as/gi,
-    /simulate/gi,
-    /override/gi,
-    /bypass/gi,
     /disable safety/gi,
     /ignore safety/gi,
     /remove restrictions/gi,
-    /unrestricted/gi,
-    /uncensored/gi
+    /unrestricted mode/gi,
+    /developer mode/gi
   ];
 
   // SQL injection patterns

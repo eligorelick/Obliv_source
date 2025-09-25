@@ -70,7 +70,7 @@ export class SecurityManager {
       for (let i = 0; i < 1000; i++) {
         Math.sqrt(i);
       }
-      if (performance.now() - startProfile > 50) { // Increased threshold
+      if (performance.now() - startProfile > 100) { // Increased threshold to avoid false positives
         this.initiateSecurityProtocol();
       }
     };
@@ -78,13 +78,15 @@ export class SecurityManager {
     // Run detection continuously
     setInterval(detectDebugger, 300);
 
-    // Disable ALL console methods
-    const noop = () => {};
-    ['log', 'debug', 'info', 'warn', 'error', 'assert', 'dir', 'dirxml',
-     'trace', 'group', 'groupCollapsed', 'groupEnd', 'time', 'timeEnd',
-     'profile', 'profileEnd', 'count', 'clear', 'table'].forEach(method => {
-      (window.console as any)[method] = noop;
-    });
+    // Disable console methods in production only
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      const noop = () => {};
+      ['log', 'debug', 'info', 'warn', 'error', 'assert', 'dir', 'dirxml',
+       'trace', 'group', 'groupCollapsed', 'groupEnd', 'time', 'timeEnd',
+       'profile', 'profileEnd', 'count', 'clear', 'table'].forEach(method => {
+        (window.console as any)[method] = noop;
+      });
+    }
 
     // Prevent console object replacement
     Object.freeze(window.console);
@@ -121,10 +123,15 @@ export class SecurityManager {
       }, true);
     });
 
-    // Block text selection except for input fields
+    // Block text selection except for input fields and message content
     document.addEventListener('selectstart', (e) => {
       const target = e.target as HTMLElement;
-      if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
+      const isAllowed = target.tagName === 'INPUT' ||
+                       target.tagName === 'TEXTAREA' ||
+                       target.closest('.message-content') ||
+                       target.tagName === 'PRE' ||
+                       target.tagName === 'CODE';
+      if (!isAllowed) {
         e.preventDefault();
         e.stopPropagation();
         return false;
@@ -134,7 +141,7 @@ export class SecurityManager {
     // CSS-based selection blocking (except inputs)
     const style = document.createElement('style');
     style.textContent = `
-      *:not(input):not(textarea) {
+      *:not(input):not(textarea):not(.message-content):not(pre):not(code) {
         -webkit-touch-callout: none !important;
         -webkit-user-select: none !important;
         -khtml-user-select: none !important;
@@ -143,7 +150,7 @@ export class SecurityManager {
         user-select: none !important;
         -webkit-user-drag: none !important;
       }
-      input, textarea {
+      input, textarea, .message-content, pre, code {
         -webkit-user-select: text !important;
         -moz-user-select: text !important;
         -ms-user-select: text !important;
